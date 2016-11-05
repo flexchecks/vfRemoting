@@ -160,7 +160,7 @@ const RemoteAction = function(o) {
 		 * Controller.Method
 		 */
 		var parts = remoteAction.split('.');
-		var namespace, controller, method;
+		/*var namespace, controller, method;
 
 		if(parts.length === 3) {
 			namespace = parts[0];
@@ -171,7 +171,9 @@ const RemoteAction = function(o) {
 			method = parts[0];
 		} else {
 			throw new Error('Invalid remote action supplied: ' + remoteAction);
-		}
+		}*/
+		if(parts.length > 3 || parts.length < 2)
+			throw new Error('Invalid remote action supplied: ' + remoteAction);
 
 		// Get all the other parameters and add them to a list
 		var args = Array.prototype.slice.call(arguments, 1);
