@@ -43,7 +43,7 @@ const RemoteAction = function(o) {
 	// Logic to bind a funciton to one of the arrays. This will only add objects where typeof  is a Function
 	var addFunction = function(arry) {
 		var args = Array.from(arguments)[1];
-		for(let i = 0; i < args.length; i++) {
+		for(var i = 0; i < args.length; i++) {
 			if(typeof args[i] === 'function')
 				arry.push(args[i]); 
 		}
@@ -56,7 +56,7 @@ const RemoteAction = function(o) {
 			arry.splice(0, arry.length);
 		}
 
-		for(let i = 0; i < arry.length; i++) {
+		for(var i = 0; i < arry.length; i++) {
 			if(arry[i].name === fnName)
 				arry.splice(i, 1);
 		}
@@ -68,7 +68,7 @@ const RemoteAction = function(o) {
 	var fire = function(arry) {
 		arry = Array.isArray(arry) ? arry : [];
 		var args = Array.prototype.slice.call(arguments, 1);
-		for(let i = 0; i < arry.length; i++) {
+		for(var i = 0; i < arry.length; i++) {
 			if(typeof arry[i] === 'function')
 				arry[i].apply(arry[i], args);
 		}
