@@ -74,6 +74,11 @@ const RemoteAction = function(o) {
 		}
 	};
 	
+	// Default data validation
+	var validator = function() {
+		return;
+	};
+
 	/* ----------------------------------------- Getters ----------------------------------------- */
 	this.getPrior = function() {
 		return doBeforeSend;
@@ -143,6 +148,15 @@ const RemoteAction = function(o) {
 		return this;
 	};
 
+	/* ----------------------------------- Set Data Validator  ----------------------------------- */
+	this.setValidator = function(fn) {
+		// Validator methods should throw exceptions when the arguments are invalid.
+		// Use this to prevent sending in objects that don't meet your implementation specific criteria
+		if(typeof fn === 'function')
+			validator = fn;
+		return this;
+	};
+
 	/* -------------------------------- Invoke the Remote Action  -------------------------------- */
 	this.send = function(remoteAction) {
 		// Make sure there is a manager
@@ -160,18 +174,7 @@ const RemoteAction = function(o) {
 		 * Controller.Method
 		 */
 		var parts = remoteAction.split('.');
-		/*var namespace, controller, method;
-
-		if(parts.length === 3) {
-			namespace = parts[0];
-			controller = parts[1];
-			method = parts[2];
-		} else if(parts.length === 2) {
-			controller = parts[0];
-			method = parts[0];
-		} else {
-			throw new Error('Invalid remote action supplied: ' + remoteAction);
-		}*/
+		
 		if(parts.length > 3 || parts.length < 2)
 			throw new Error('Invalid remote action supplied: ' + remoteAction);
 
@@ -179,6 +182,11 @@ const RemoteAction = function(o) {
 		var args = Array.prototype.slice.call(arguments, 1);
 
 		args = args === undefined ? [] : args;
+
+		// Send the arguments through the validator.
+		if(typeof validator === function) {
+			validator.apply(validator, args);
+		}
 
 		// Callback for the remote action
 		var cb = function(vfResponse, vfEvent) {
