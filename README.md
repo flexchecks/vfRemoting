@@ -66,7 +66,7 @@ One or more functions that will be called during the callback of the remote acti
 
 **function:** One or more additional function objects, separated by commas.
 
-One or more functions that will be called during the callback of the remote action if it is a failure. Failure is defined as not a success, or specifically, a falsy event.status or a falsey response.isSuccess. Functions are called with three parameters. Response, Event, RemoteAction.
+One or more functions that will be called during the callback of the remote action if it is a failure. Failure is defined as not a success, or specifically, a falsy event.status or a falsey response.isSuccess. Functions are called with four parameters. Response, Event, Error, RemoteAction.
 
 ### onComplete(function, [,function])
 **function:** A function object
