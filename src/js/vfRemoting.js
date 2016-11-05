@@ -243,14 +243,19 @@ const RemotePromise = function(o) {
 	this.send = function(method, data) {
 		return new Promise(function(resolve, reject) {
 			// Bind a function to onSuccess to resolve the promise, and onFailure to reject the promise, then send the request.
-			ra
-				.onSuccess(function doResolve(vfResponse, vfEvent, remoteAction) {
-					resolve({response: vfResponse, event : vfEvent, remoteAction : remoteAction});
-				})
-				.onFailure(function doReject(vfResponse, vfEvent, err, remoteAction) {
-					reject({response: vfResponse, event : vfEvent, remoteAction : remoteAction, error: err});
-				})
-				.send(method, data);
+			try {
+				ra
+					.onSuccess(function doResolve(vfResponse, vfEvent, remoteAction) {
+						resolve({response: vfResponse, event : vfEvent, remoteAction : remoteAction});
+					})
+					.onFailure(function doReject(vfResponse, vfEvent, err, remoteAction) {
+						reject({response: vfResponse, event : vfEvent, remoteAction : remoteAction, error: err});
+					})
+					.send(method, data);
+			} catch(e) {
+				reject(e);
+			}
+			
 		});
 	};
 };
