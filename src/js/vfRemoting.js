@@ -25,7 +25,7 @@ const RemoteAction = function(o) {
 		
 	};
 
-	this.getBefore = function() {
+	this.getPrior = function() {
 		return doBeforeSend;
 	};
 
