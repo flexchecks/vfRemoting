@@ -184,7 +184,7 @@ const RemoteAction = function(o) {
 		args = args === undefined ? [] : args;
 
 		// Send the arguments through the validator.
-		if(typeof validator === function) {
+		if(typeof validator === 'function') {
 			validator.apply(validator, args);
 		}
 
