@@ -12,6 +12,15 @@ const RemoteAction = function(o) {
 	} catch(e) {
 
 	}
+
+	var fire = function(arry) {
+		arry = Array.isArray(arry) ? arry : [];
+		var args = Array.prototype.slice.call(arguments, 1);
+		for(let i = 0; i < arry.length; i++) {
+			if(typeof arry[i] === 'function')
+				arry[i].apply(arry[i], args);
+		}
+	};
 	
 
 	const options = typeof o === 'object' ? o : undefined;
@@ -129,24 +138,30 @@ const RemoteAction = function(o) {
 
 		var cb = function(vfResponse, vfEvent) {
 			if(vfEvent.status && (vfResponse.isSuccess === undefined || vfResponse.isSuccess === true)) {
-				for(let i = 0; i < doOnSuccess.length; i++) {
+				fire(doOnSuccess, vfResponse, vfEvent, this);
+				/*for(let i = 0; i < doOnSuccess.length; i++) {
+					if(typeof doOnSuccess[i])
 					doOnSuccess[i](vfResponse, vfEvent, this);
-				}
+				}*/
 			} else {
 				var err = new Error(vfEvent.message);
 				err.result = vfResponse;
 				if(vfEvent.type === 'exception') {
 					err.apexStackTrace = vfEvent.where;
 				}
+				fire(doOnFailure, vfResponse, err, this);
+				/*
 				for(let i = 0; i < doOnFailure.length; i++) {
 					doOnFailure[i](err, vfResponse, this);
 				}
-
+				*/
 			}
-
+			fire(doOnComplete, vfResponse, vfEvent, this);
+			/*
 			for(let i = 0; i < doOnComplete.length; i++) {
 				doOnComplete[i](this);
 			}
+			*/
 		};
 
 		args.push(cb);
@@ -157,10 +172,12 @@ const RemoteAction = function(o) {
 
 		args.splice(0,0,remoteAction);
 
+		/*
 		for(let i = 0; i < doBeforeSend.length; i++) {
 			doBeforeSend[i](this);
 		}
-
+		*/
+		fire(doBeforeSend, this);
 
 		Manager.invokeAction.apply(Manager, args);
 	};
