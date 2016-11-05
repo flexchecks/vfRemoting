@@ -72,6 +72,7 @@ One or more functions that will be called during the callback of the remote acti
 **function:** A function object
 
 **function:** One or more additional function objects, separated by commas.
+
 One or more functions that will be called during the callback of the remote action regardless of its success or failure. Functions are called with three parameters. Response, Event, RemoteAction.
 
 ### offPrior(function-name), offPrior()
