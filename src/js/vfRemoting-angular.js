@@ -211,6 +211,12 @@ SOFTWARE.
 					offComplete : function(fnName) {
 						removeFunction(doOnComplete, fnName);
 					},
+					offAll : function() {
+						removeFunction(doOnComplete);
+						removeFunction(doOnSuccess);
+						removeFunction(doOnFailure);
+						removeFunction(doBeforeSend);
+					},
 					send : function(remoteAction) {
 						doSend.apply(arguments);
 					},
