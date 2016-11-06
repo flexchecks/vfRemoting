@@ -240,7 +240,7 @@ const RemotePromise = function(o) {
 	};
 
 	// Returns a promise object of the RemoteAction
-	this.send = function(method, data) {
+	this.send = function(method) {
 		return new Promise(function(resolve, reject) {
 			// Bind a function to onSuccess to resolve the promise, and onFailure to reject the promise, then send the request.
 			try {
@@ -251,7 +251,7 @@ const RemotePromise = function(o) {
 					.onFailure(function doReject(vfResponse, vfEvent, err, remoteAction) {
 						reject({response: vfResponse, event : vfEvent, remoteAction : remoteAction, error: err});
 					})
-					.send(method, data);
+					.send.apply(arguments);
 			} catch(e) {
 				reject(e);
 			}
