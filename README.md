@@ -39,6 +39,57 @@ remotePromise
   .then(onPromiseResolvedCallback, onPromisedRejectedCallback)
   .catch(onPromiseExceptionCallback);
 ```
+
+##AngularJS
+This example shows how to include and use the basic RemoteAction provider
+```javascript
+angular.module('YourModule', ['vfRemoting'])
+  .controller('YourController', ['vfRemote', function YourController(vfRemote) {
+      var sendRequest = function() {
+        // Call offAll if you want to unbind all functions
+        vfRemote.offAll();
+        
+        // Bind any functions you need
+        vfRemote.onPrior(onPriorCallback, onPriorCallbackTwo);
+        vfRemote.onSuccess(onSuccessCallback);
+        vfRemote.onFailure(onFailureCallback);
+        vfRemote.onComplete(onCompleteCallback);
+        vfRemote.send('Remoter.get', {dataString: 'This is some data', apexType:'RemoterImp.Request'});
+      };
+      
+      // call your function however you need
+  }]);
+```
+
+This example shows how to include and use the promise function on the provider
+```javascript
+angular.module('YourModule', ['vfRemoting'])
+  .controller('YourController', ['vfRemote', function YourController(vfRemote) {
+      var sendRequest = function() {
+        // Call offAll if you want to unbind all functions
+        vfRemote.offAll();
+        
+        // Bind any functions you need
+        vfRemote.onPrior(onPriorCallback);
+        vfRemote.onComplete(onCompleteCallback);
+        vfRemote.promise('Remoter.get', {dataString: 'This is some data', apexType:'RemoterImp.Request'})
+          .then(onSuccessCallback, onFailureCallback)
+          .catch(onHandleExceptionCallback);
+      };
+      
+      // call your function however you need
+  }]);
+```
+
+Here are some configurable options
+```javascript
+angular.module('YourModule', ['vfRemoting'])
+  .config(['vfRemoteProvider', function(vfRemoteProvider){
+    vfRemoteProvider.setManager(ManagerObject);
+    vfRemoteProvider.setOptions({escape:false});
+    vfRemoteProvider.setValidator(validatorFunction);
+  }]);
+```
 *****************************
 # API Documentation
 ##RemoteAction(options)
@@ -132,3 +183,28 @@ Returns the RemoteAction instance to expose its functions.
 
 Adds a function to reject the promise onFailure, and resolve the promise onSuccess, then calls the RemoteAction.send(Remote-Action-Name, [,Parameter]) function.
 
+##AngularJS provider
+Allows you to add the vfRemote provider to your angular project. The provider exposes all the functions listed above with only a minor change. Getters are in the vfRemoting.get object _(to call: vfRemoting.get.prior())_. Also, the promise functionality is included by calling .promise(Remote-Action-Name, [,Parameter]) instead of .send(Remote-Action-Name, [,Parameter]). 
+
+###offAll()
+Removes all bound functions.
+
+###promise(Remote-Action-Name, [,Parameter])
+**Remote-Action-Name:** The fully qualified remote action name in the format of _Namespace_._Controller_._Method_.  _Namespace_ is optional.
+
+Same functionality as RemotePromise.send(Remote-Action-Name, [,Parameter]).
+
+##AngularJS Provider Config Options
+###setManager(manager)
+**manager:** An object with an _invokeAction_ function.
+
+Allows you to set the manager. Defaults to Visualforce.remoting.Manager, but if you are testing in a different environment, you can set the manager to a mock.
+
+###setOptions(options)
+**options:** An object for Visualforce Remoting options.
+
+Appends this object to the end of all invokeAction calls as the options parameter.
+###setValidator(function)
+**function:** A function that takes your parameters as an argument and throws errors if it is invalid.
+
+Allows you to set your implementation's data validation.
