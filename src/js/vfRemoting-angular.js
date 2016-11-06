@@ -1,7 +1,7 @@
 /*global*/
 'use strict';
 (function() {
-	angular.module('vfRemoting')
+	angular.module('vfRemoting', [])
 		.provider('vfRemote', function vfRemote() {
 			const doBeforeSend = [];	// Array of functions to call before invoking Manager.invokeAction
 			const doOnSuccess = [];		// Array of functions to call during the remote action callback when the response is a success
@@ -121,7 +121,7 @@
 				args.splice(0,0,remoteAction);
 
 				// Fire all onPrior bound functions
-				fire(doBeforeSend, this);
+				fire(doBeforeSend, {method: remoteAction, args : args});
 
 				// Invoke the remote action
 				Manager.invokeAction.apply(Manager, args);
@@ -148,7 +148,7 @@
 				return this;
 			};
 
-			this.$get(function() {
+			this.$get = function() {
 				return {
 					get : {
 						prior : function() {
@@ -189,25 +189,26 @@
 						removeFunction(doOnComplete, fnName);
 					},
 					send : function(remoteAction) {
-						doSend(remoteAction);
+						doSend.apply(arguments);
 					},
 					promise : function(remoteAction) {
+						var args = arguments;
 						return new Promise(function(resolve, reject) {
 							try {
-								addFunction(doOnSuccess, function doResolve(vfResponse, vfEvent, remoteAction) {
-									resolve({response: vfResponse, event : vfEvent, remoteAction : remoteAction});
-								});
-								addFunction(doOnFailure, function doReject(vfResponse, vfEvent, err, remoteAction) {
-									reject({response: vfResponse, event : vfEvent, remoteAction : remoteAction, error: err});
-								});
-								doSend.apply(doSend, arguments);
+								addFunction(doOnSuccess, [function doResolve(vfResponse, vfEvent, remoteAction) {
+                                    resolve({response: vfResponse, event : vfEvent, remoteAction : remoteAction});
+                                }]);
+								addFunction(doOnFailure, [function doReject(vfResponse, vfEvent, err, remoteAction) {
+                                    reject({response: vfResponse, event : vfEvent, remoteAction : remoteAction, error: err});
+                                }]);
+								doSend.apply(doSend, args);
 							} catch(e) {
 								reject(e);
 							}
 						});
 					}
 				};
-			});
+			};
 		});
 		
 })();
