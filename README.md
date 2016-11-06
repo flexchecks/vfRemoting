@@ -101,6 +101,11 @@ Returns the array of functions for the specified array. Mostly used in testing.
 ### setManager(Manager)
 **Manager:** Object type with an invokeAction function. Useful for testing to pass a Mock in.
 
+### setValidator(Function) 
+**Function:** A function to use as a data validator. 
+
+The data validator is called before the remote action is invoked, and is passed in all the arguments that will be passed into the remote action as parameters. Use this to set implementation specific data validation.
+
 ### send(Remote-Action-Name, [,Parameter])
 **Remote-Action-Name:** The fully qualified remote action name in the format of _Namespace_._Controller_._Method_
 
