@@ -1,4 +1,4 @@
-/*global*/
+/*global Visualforce*/
 /*
 MIT License
 
@@ -32,6 +32,7 @@ SOFTWARE.
 			const doOnComplete = [];	// Array of functions to call during the remote action callback regardless if it is a success or failure
 
 			var Manager;				// The manager, defaults to Visualforce.remoting.Manager
+			var options;
 			try {
 				// Try to set the manager, if it fails, then the remoting manager is not present on the page.
 				Manager = Visualforce.remoting.Manager;
@@ -40,7 +41,7 @@ SOFTWARE.
 			}
 			
 			// Set the options object if it is an object.
-			var options = typeof o === 'object' ? o : undefined;
+			//var options = typeof o === 'object' ? o : undefined;
 
 			// Logic to bind a funciton to one of the arrays. This will only add objects where typeof  is a Function
 			var addFunction = function(arry) {
