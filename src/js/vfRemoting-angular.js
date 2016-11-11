@@ -218,7 +218,7 @@ SOFTWARE.
 						removeFunction(doBeforeSend);
 					},
 					send : function(remoteAction) {
-						doSend.apply(arguments);
+						doSend.apply(doSend, arguments);
 					},
 					promise : function(remoteAction) {
 						var args = arguments;
