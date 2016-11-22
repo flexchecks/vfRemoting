@@ -146,10 +146,12 @@ SOFTWARE.
 
 				// Fire all onPrior bound functions
 				fire(doBeforeSend, {method: remoteAction, args : args});
-
+				console.log('Arguments', args);
 				// Invoke the remote action
 				Manager.invokeAction.apply(Manager, args);
 			};
+
+			var promisable = true;
 
 			/* ------------------------------------- Set the Manager ------------------------------------- */
 			this.setManager = function(mng) {
@@ -171,6 +173,13 @@ SOFTWARE.
 					validator = fn;
 				return this;
 			};
+
+			/* ------------------------------------- Set Promisable  ------------------------------------- */
+			this.setPromisable = function(bool) {
+				promisable = typeof bool === 'boolean' ? bool : promisable;
+			};
+
+
 
 			this.$get = function() {
 				return {
@@ -223,19 +232,54 @@ SOFTWARE.
 					},
 					promise : function(remoteAction) {
 						var args = arguments;
-						return new Promise(function(resolve, reject) {
-							try {
-								addFunction(doOnSuccess, [function doResolve(vfResponse, vfEvent, remoteAction) {
-                                    resolve({response: vfResponse, event : vfEvent, remoteAction : remoteAction});
-                                }]);
-								addFunction(doOnFailure, [function doReject(vfResponse, vfEvent, err, remoteAction) {
-                                    reject({response: vfResponse, event : vfEvent, remoteAction : remoteAction, error: err});
-                                }]);
-								doSend.apply(doSend, args);
-							} catch(e) {
-								reject(e);
-							}
-						});
+						if(promisable) {
+							// Return a promise if promisable
+							return new Promise(function(resolve, reject) {
+								try {
+									addFunction(doOnSuccess, [function doResolve(vfResponse, vfEvent, remoteAction) {
+	                                    resolve({response: vfResponse, event : vfEvent, remoteAction : remoteAction});
+	                                }]);
+									addFunction(doOnFailure, [function doReject(vfResponse, vfEvent, err, remoteAction) {
+	                                    reject({response: vfResponse, event : vfEvent, remoteAction : remoteAction, error: err});
+	                                }]);
+									doSend.apply(doSend, args);
+								} catch(e) {
+									reject(e);
+								}
+							});
+						} else {
+							// Otherwise, return a function that has a .then() function
+							var obj = {
+								then : function(resolveFn, rejectFn) {
+									removeFunction(doOnComplete);
+									removeFunction(doOnSuccess);
+									removeFunction(doOnFailure);
+									removeFunction(doBeforeSend);
+
+									var resolve = function(vfResponse, vfEvent, remoteAction) {
+										if(typeof resolveFn === 'function')
+											resolveFn({response : vfResponse, event : vfEvent, remoteAction : remoteAction});
+									};
+
+									var reject = function(vfResponse, vfEvent, errors, remoteAction) {
+										if(typeof rejectFn === 'function')
+											rejectFn({respones:vfResponse, event : vfEvent, remoteAction: remoteAction, error : errors});
+									};
+
+									addFunction(doOnSuccess, [resolve]);
+									addFunction(doOnFailure, [reject]);
+
+									doSend.apply(doSend, args);
+									return obj;
+								},
+								catch : function() {
+									// Sorry, but IE sucks
+									return obj;
+								}
+							};
+							return obj;
+						}
+						
 					}
 				};
 			};
